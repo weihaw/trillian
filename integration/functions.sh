@@ -1,3 +1,4 @@
+#!/bin/bash -x -v
 # Functions for setting up Trillian integration tests
 
 if [[ -z "${TMPDIR}" ]]; then

@@ -65,7 +65,10 @@ collect_vars() {
 main() {
   collect_vars "$@"
 
-  readonly TRILLIAN_PATH=$(go list -f '{{.Dir}}' github.com/google/trillian)
+  #readonly TRILLIAN_PATH=$(go list -f '{{.Dir}}' github.com/google/trillian)
+  # go is missing for root env
+  readonly TRILLIAN_PATH=/usr/local/google/home/weihaw/go/src/github.com/google/trillian
+  echo TRILLIAN_PATH $TRILLIAN_PATH
 
   echo "Warning: about to destroy and reset database '${MYSQL_DATABASE}'"
 
