@@ -113,6 +113,10 @@ func (c *MockLogClient) GetLeavesByIndex(ctx context.Context, in *trillian.GetLe
 	return c.c.GetLeavesByIndex(ctx, in)
 }
 
+func (c *MockLogClient) GetCertHistory(ctx context.Context, in *trillian.GetCertHistoryRequest, opts ...grpc.CallOption) (*trillian.GetCertHistoryResponse, error) {
+	return c.c.GetCertHistory(ctx, in)
+}
+
 // GetLeavesByRange forwards requests.
 func (c *MockLogClient) GetLeavesByRange(ctx context.Context, in *trillian.GetLeavesByRangeRequest, opts ...grpc.CallOption) (*trillian.GetLeavesByRangeResponse, error) {
 	return c.c.GetLeavesByRange(ctx, in)

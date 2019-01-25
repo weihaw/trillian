@@ -332,6 +332,7 @@ func RunLeafHistory(ctx context.Context, t *testing.T, tadmin trillian.TrillianA
 				}
 
 				for _, batch := range tc.set {
+					fmt.Printf("batch size %+v\n", batch)
 					_, err := tmap.SetLeaves(ctx, &trillian.SetMapLeavesRequest{
 						MapId:  tree.TreeId,
 						Leaves: batch,

@@ -93,12 +93,13 @@ func (t *logTreeTX) UpdateSequencedLeaves(ctx context.Context, leaves []*trillia
 		}
 		_, err = t.tx.ExecContext(
 			ctx,
-			insertSequencedLeafSQL+valuesPlaceholder5,
+			insertSequencedLeafSQL+valuesPlaceholder6,
 			t.treeID,
 			leaf.LeafIdentityHash,
 			leaf.MerkleLeafHash,
 			leaf.LeafIndex,
-			iTimestamp.UnixNano())
+			iTimestamp.UnixNano(),
+			leaf.CrlSetKey)
 		if err != nil {
 			glog.Warningf("Failed to update sequenced leaves: %s", err)
 			return err

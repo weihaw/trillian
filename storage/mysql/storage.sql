@@ -85,6 +85,9 @@ CREATE TABLE IF NOT EXISTS LeafData(
   ExtraData            LONGBLOB,
   -- The timestamp from when this leaf data was first queued for inclusion.
   QueueTimestampNanos  BIGINT NOT NULL,
+  -- CRLSet name of the certificate.
+  CrlSetKey            TEXT CHARACTER SET Latin1,
+
   PRIMARY KEY(TreeId, LeafIdentityHash),
   FOREIGN KEY(TreeId) REFERENCES Trees(TreeId) ON DELETE CASCADE
 );
@@ -106,6 +109,9 @@ CREATE TABLE IF NOT EXISTS SequencedLeafData(
   -- CT this hash will include the leaf prefix byte as well as the leaf data.
   MerkleLeafHash       VARBINARY(255) NOT NULL,
   IntegrateTimestampNanos BIGINT NOT NULL,
+  -- CRLSet name of the certificate.
+  CrlSetKey            TEXT CHARACTER SET Latin1,
+
   PRIMARY KEY(TreeId, SequenceNumber),
   FOREIGN KEY(TreeId) REFERENCES Trees(TreeId) ON DELETE CASCADE,
   FOREIGN KEY(TreeId, LeafIdentityHash) REFERENCES LeafData(TreeId, LeafIdentityHash) ON DELETE CASCADE

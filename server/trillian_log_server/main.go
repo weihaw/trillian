@@ -44,6 +44,7 @@ import (
 	_ "github.com/google/trillian/crypto/keys/der/proto"
 	_ "github.com/google/trillian/crypto/keys/pem/proto"
 	_ "github.com/google/trillian/crypto/keys/pkcs11/proto"
+
 	// Load hashers
 	_ "github.com/google/trillian/merkle/objhasher"
 	_ "github.com/google/trillian/merkle/rfc6962"
@@ -57,6 +58,8 @@ var (
 	tlsKeyFile      = flag.String("tls_key_file", "", "Path to the TLS server key. If unset, the server will use unsecured connections.")
 	etcdService     = flag.String("etcd_service", "trillian-logserver", "Service name to announce ourselves under")
 	etcdHTTPService = flag.String("etcd_http_service", "trillian-logserver-http", "Service name to announce our HTTP endpoint under")
+
+	previewMode = flag.Bool("preview_mode", false, "Enable veto mode")
 
 	quotaDryRun = flag.Bool("quota_dry_run", false, "If true no requests are blocked due to lack of tokens")
 
@@ -135,6 +138,7 @@ func main() {
 		TLSKeyFile:   *tlsKeyFile,
 		StatsPrefix:  "log",
 		ExtraOptions: options,
+		PreviewMode:  *previewMode,
 		QuotaDryRun:  *quotaDryRun,
 		DBClose:      sp.Close,
 		Registry:     registry,

@@ -90,6 +90,9 @@ type Main struct {
 
 	// These will be added to the GRPC server options.
 	ExtraOptions []grpc.ServerOption
+
+	// Whether the server will generate a map of certs in addition to the log.
+	PreviewMode bool
 }
 
 func (m *Main) healthz(rw http.ResponseWriter, req *http.Request) {

@@ -688,6 +688,37 @@ func (t *TrillianLogRPCServer) getTreeAndContext(ctx context.Context, treeID int
 	return tree, trees.NewContext(ctx, tree), nil
 }
 
+// GetCertHistory
+func (t *TrillianLogRPCServer) GetCertHistory(ctx context.Context, req *trillian.GetCertHistoryRequest) (*trillian.GetCertHistoryResponse, error) {
+	ctx, span := spanFor(ctx, "GetCertHistory")
+	defer span.End()
+	// Get snapshot.  Then query for history.
+	tree, ctx, err := t.getTreeAndContext(ctx, req.LogId, optsLogRead)
+	if err != nil {
+		return nil, err
+	}
+	tx, err := t.registry.LogStorage.SnapshotForTree(ctx, tree)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Close()
+
+	leaves, err := tx.GetCertHistory(ctx, req.CrlSetKey)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := t.commitAndLog(ctx, req.LogId, tx, "GetCertHistory"); err != nil {
+		return nil, err
+	}
+	// Only LogLeaves are returned for now.
+	response := trillian.GetCertHistoryResponse{}
+	for _, leaf := range leaves {
+		response.Leaves = append(response.Leaves, leaf)
+	}
+	return &response, nil
+}
+
 // InitLog initialises a freshly created Log by creating the first STH with
 // size 0.
 func (t *TrillianLogRPCServer) InitLog(ctx context.Context, req *trillian.InitLogRequest) (*trillian.InitLogResponse, error) {

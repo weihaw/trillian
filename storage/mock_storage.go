@@ -6,10 +6,11 @@ package storage
 
 import (
 	context "context"
-	gomock "github.com/golang/mock/gomock"
-	trillian "github.com/google/trillian"
 	reflect "reflect"
 	time "time"
+
+	gomock "github.com/golang/mock/gomock"
+	trillian "github.com/google/trillian"
 )
 
 // MockAdminStorage is a mock of AdminStorage interface
@@ -429,6 +430,19 @@ func (m *MockLogTreeTX) GetLeavesByHash(arg0 context.Context, arg1 [][]byte, arg
 // GetLeavesByHash indicates an expected call of GetLeavesByHash
 func (mr *MockLogTreeTXMockRecorder) GetLeavesByHash(arg0, arg1, arg2 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLeavesByHash", reflect.TypeOf((*MockLogTreeTX)(nil).GetLeavesByHash), arg0, arg1, arg2)
+}
+
+// GetLeavesByHash mocks base method
+func (m *MockLogTreeTX) GetCertHistory(arg0 context.Context, arg1 string) ([]*trillian.LogLeaf, error) {
+	ret := m.ctrl.Call(m, "GetCertHistory", arg0, arg1)
+	ret0, _ := ret[0].([]*trillian.LogLeaf)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLeavesByHash indicates an expected call of GetLeavesByHash
+func (mr *MockLogTreeTXMockRecorder) GetCertHistory(arg0, arg1 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCertHistory", reflect.TypeOf((*MockLogTreeTX)(nil).GetCertHistory), arg0, arg1)
 }
 
 // GetLeavesByIndex mocks base method
@@ -1106,6 +1120,17 @@ func (m *MockReadOnlyLogTreeTX) GetLeavesByHash(arg0 context.Context, arg1 [][]b
 // GetLeavesByHash indicates an expected call of GetLeavesByHash
 func (mr *MockReadOnlyLogTreeTXMockRecorder) GetLeavesByHash(arg0, arg1, arg2 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLeavesByHash", reflect.TypeOf((*MockReadOnlyLogTreeTX)(nil).GetLeavesByHash), arg0, arg1, arg2)
+}
+
+func (m *MockReadOnlyLogTreeTX) GetCertHistory(arg0 context.Context, arg1 string) ([]*trillian.LogLeaf, error) {
+	ret := m.ctrl.Call(m, "GetCertHistory", arg0, arg1)
+	ret0, _ := ret[0].([]*trillian.LogLeaf)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (mr *MockReadOnlyLogTreeTXMockRecorder) GetCertHistory(arg0, arg1 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCertHistory", reflect.TypeOf((*MockReadOnlyLogTreeTX)(nil).GetCertHistory), arg0, arg1)
 }
 
 // GetLeavesByIndex mocks base method

@@ -79,6 +79,12 @@ func sthKey(treeID int64, timestamp uint64) btree.Item {
 	return &kv{k: fmt.Sprintf("/%d/sth/%020d", treeID, timestamp)}
 }
 
+// crlSetKey formats a key for use in a tree's BTree store.
+// The associated Item value will be the leaf with the given CRL set key.
+func formatCrlSetKey(treeID int64, crlSetKey string) btree.Item {
+	return &kv{k: fmt.Sprintf("/%d/crlset/%s", treeID, crlSetKey)}
+}
+
 // getActiveLogIDs returns the IDs of all logs that are currently in a state
 // that requires sequencing (e.g. ACTIVE, DRAINING).
 func getActiveLogIDs(trees map[int64]*tree) []int64 {
@@ -339,6 +345,16 @@ func (t *logTreeTX) GetLeavesByHash(ctx context.Context, leafHashes [][]byte, or
 			}
 			ret = append(ret, l.(*kv).v.(*trillian.LogLeaf))
 		}
+	}
+	return ret, nil
+}
+
+func (t *logTreeTX) GetCertHistory(ctx context.Context, crlSetKey string) ([]*trillian.LogLeaf, error) {
+	// Likely this doesn't really work but I'm not sure we want to spend time on implementing this.
+	ret := make([]*trillian.LogLeaf, 0, 1) // 1 is an arbitrary.
+	leaf := t.tx.Get(formatCrlSetKey(t.treeID, crlSetKey))
+	if leaf != nil {
+		ret = append(ret, leaf.(*kv).v.(*trillian.LogLeaf))
 	}
 	return ret, nil
 }

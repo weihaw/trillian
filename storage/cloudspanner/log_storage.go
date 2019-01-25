@@ -847,6 +847,10 @@ func (tx *logTX) GetLeavesByHash(ctx context.Context, hashes [][]byte, bySeq boo
 	return tx.getUsingIndex(ctx, seqDataByMerkleHashIdx, hashes, bySeq)
 }
 
+func (tx *logTX) GetCertHistory(ctx context.Context, crlSetKey string) ([]*trillian.LogLeaf, error) {
+	return nil, fmt.Errorf("GetCertHistory unsupported w/CloudSpanner")
+}
+
 // QueuedEntry represents a leaf which was dequeued.
 // It's used to store some extra info which is necessary for rebuilding the
 // leaf's primary key when it's passed back in to UpdateSequencedLeaves.

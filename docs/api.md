@@ -9,6 +9,9 @@
     - [AddSequencedLeavesRequest](#trillian.AddSequencedLeavesRequest)
     - [AddSequencedLeavesResponse](#trillian.AddSequencedLeavesResponse)
     - [ChargeTo](#trillian.ChargeTo)
+    - [CheckPoint](#trillian.CheckPoint)
+    - [GetCertHistoryRequest](#trillian.GetCertHistoryRequest)
+    - [GetCertHistoryResponse](#trillian.GetCertHistoryResponse)
     - [GetConsistencyProofRequest](#trillian.GetConsistencyProofRequest)
     - [GetConsistencyProofResponse](#trillian.GetConsistencyProofResponse)
     - [GetEntryAndProofRequest](#trillian.GetEntryAndProofRequest)
@@ -184,6 +187,55 @@ be checked and charged.
 | user | [string](#string) | repeated | user is a list of personality-defined strings. Trillian will treat them as /User/%{user}/... keys when checking and charging quota. If one or more of the specified users has insufficient quota, the request will be denied.
 
 As an example, a Certificate Transparency frontend might set the following user strings when sending a QueueLeaves request to the Trillian log: - The requesting IP address. This would limit the number of requests per IP. - The &#34;intermediate-&lt;hash&gt;&#34; for each of the intermediate certificates in the submitted chain. This would have the effect of limiting the rate of submissions under a given intermediate/root. |
+
+
+
+
+
+
+<a name="trillian.CheckPoint"></a>
+
+### CheckPoint
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| check_pointer | [string](#string) |  |  |
+| latest_index | [int64](#int64) |  | Where the checkpoint is at. |
+
+
+
+
+
+
+<a name="trillian.GetCertHistoryRequest"></a>
+
+### GetCertHistoryRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| log_id | [int64](#int64) |  |  |
+| crl_set_key | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="trillian.GetCertHistoryResponse"></a>
+
+### GetCertHistoryResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| leaves | [LogLeaf](#trillian.LogLeaf) | repeated |  |
+| check_points | [CheckPoint](#trillian.CheckPoint) | repeated |  |
+| current_index | [int64](#int64) |  |  |
 
 
 
@@ -542,6 +594,7 @@ E.g., in a CT personality multiple `add-chain` calls for an identical certificat
 Continuing the CT example, for a CT mirror personality (which must allow dupes since the source log could contain them), the part of the personality which fetches and submits the entries might set `leaf_identity_hash` to `H(leaf_index||cert)`. TODO(pavelkalinnikov): Consider instead using `H(cert)` and allowing identity hash dupes in `PREORDERED_LOG` mode, for it can later be upgraded to `LOG` which will need to correctly detect duplicates with older entries when new ones get queued. |
 | queue_timestamp | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Output only. The time at which this leaf was passed to `QueueLeaves`. This value will be determined and set by the LogServer. Equals zero if the entry was submitted without queuing. |
 | integrate_timestamp | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Output only. The time at which this leaf was integrated into the tree. This value will be determined and set by the LogSigner. |
+| crl_set_key | [string](#string) |  | CrlSetKey- to lookup entries by certificate. |
 
 
 
@@ -671,6 +724,7 @@ operations such as obtaining tree leaves, inclusion/consistency proofs etc.
 | GetLatestSignedLogRoot | [GetLatestSignedLogRootRequest](#trillian.GetLatestSignedLogRootRequest) | [GetLatestSignedLogRootResponse](#trillian.GetLatestSignedLogRootResponse) | Returns the latest signed log root for a given tree. Corresponds to the ReadOnlyLogTreeTX.LatestSignedLogRoot storage interface. |
 | GetSequencedLeafCount | [GetSequencedLeafCountRequest](#trillian.GetSequencedLeafCountRequest) | [GetSequencedLeafCountResponse](#trillian.GetSequencedLeafCountResponse) | Returns the total number of leaves that have been integrated into the given tree. Corresponds to the ReadOnlyLogTreeTX.GetSequencedLeafCount storage interface. DO NOT USE - FOR DEBUGGING/TEST ONLY |
 | GetEntryAndProof | [GetEntryAndProofRequest](#trillian.GetEntryAndProofRequest) | [GetEntryAndProofResponse](#trillian.GetEntryAndProofResponse) | Returns log entry and the corresponding inclusion proof for a given leaf index in a given tree. If the requested tree is unavailable but the leaf is in scope for the current tree, return a proof in that tree instead. |
+| GetCertHistory | [GetCertHistoryRequest](#trillian.GetCertHistoryRequest) | [GetCertHistoryResponse](#trillian.GetCertHistoryResponse) | Get certificate history for a given certificate as defined by crl_set_key and for the given log as defined by the log_id. |
 | InitLog | [InitLogRequest](#trillian.InitLogRequest) | [InitLogResponse](#trillian.InitLogResponse) |  |
 | QueueLeaves | [QueueLeavesRequest](#trillian.QueueLeavesRequest) | [QueueLeavesResponse](#trillian.QueueLeavesResponse) | Adds a batch of leaves to the queue. |
 | AddSequencedLeaves | [AddSequencedLeavesRequest](#trillian.AddSequencedLeavesRequest) | [AddSequencedLeavesResponse](#trillian.AddSequencedLeavesResponse) | Stores leaves from the provided batch and associates them with the log positions according to the `LeafIndex` field. The indices must be contiguous.
@@ -851,7 +905,7 @@ MapLeaf represents the data behind Map leaves.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | index | [bytes](#bytes) |  | index is the location of this leaf. All indexes for a given Map must contain a constant number of bits. These are not numeric indices. Note that this is typically derived using a hash and thus the length of all indices in the map will match the number of bits in the hash function. Map entries do not have a well defined ordering and it&#39;s not possible to sequentially iterate over them. |
-| leaf_hash | [bytes](#bytes) |  | leaf_hash is the tree hash of leaf_value. This does not need to be set on SetMapLeavesRequest; the server will fill it in. |
+| leaf_hash | [bytes](#bytes) |  | leaf_hash is the tree hash of leaf_value. This does not need to be set on SetMapLeavesRequest; the server will fill it in. For an empty leaf (len(leaf_value)==0), there may be two possible values for this hash: - If the leaf has never been set, it counts as an empty subtree and a nil value is used. - If the leaf has been explicitly set to a zero-length entry, it no longer counts as empty and the value of hasher.HashLeaf(index, nil) will be used. |
 | leaf_value | [bytes](#bytes) |  | leaf_value is the data the tree commits to. |
 | extra_data | [bytes](#bytes) |  | extra_data holds related contextual data, but is not covered by any hash. |
 
@@ -869,7 +923,7 @@ MapLeaf represents the data behind Map leaves.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | leaf | [MapLeaf](#trillian.MapLeaf) |  |  |
-| inclusion | [bytes](#bytes) | repeated |  |
+| inclusion | [bytes](#bytes) | repeated | inclusion holds the inclusion proof for this leaf in the map root. It holds one entry for each level of the tree; combining each of these in turn with the leaf&#39;s hash (according to the tree&#39;s hash strategy) reproduces the root hash. A nil entry for a particular level indicates that the node in question has an empty subtree beneath it (and so its associated hash value is hasher.HashEmpty(index, height) rather than hasher.HashChildren(l_hash, r_hash)). |
 
 
 

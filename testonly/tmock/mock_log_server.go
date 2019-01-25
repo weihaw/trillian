@@ -60,6 +60,19 @@ func (mr *MockTrillianLogServerMockRecorder) AddSequencedLeaves(arg0, arg1 inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddSequencedLeaves", reflect.TypeOf((*MockTrillianLogServer)(nil).AddSequencedLeaves), arg0, arg1)
 }
 
+// GetCertHistory mocks base method
+func (m *MockTrillianLogServer) GetCertHistory(arg0 context.Context, arg1 *trillian.GetCertHistoryRequest) (*trillian.GetCertHistoryResponse, error) {
+	ret := m.ctrl.Call(m, "GetCertHistory", arg0, arg1)
+	ret0, _ := ret[0].(*trillian.GetCertHistoryResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCertHistory indicates an expected call of GetCertHistory
+func (mr *MockTrillianLogServerMockRecorder) GetCertHistory(arg0, arg1 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCertHistory", reflect.TypeOf((*MockTrillianLogServer)(nil).GetCertHistory), arg0, arg1)
+}
+
 // GetConsistencyProof mocks base method
 func (m *MockTrillianLogServer) GetConsistencyProof(arg0 context.Context, arg1 *trillian.GetConsistencyProofRequest) (*trillian.GetConsistencyProofResponse, error) {
 	ret := m.ctrl.Call(m, "GetConsistencyProof", arg0, arg1)
